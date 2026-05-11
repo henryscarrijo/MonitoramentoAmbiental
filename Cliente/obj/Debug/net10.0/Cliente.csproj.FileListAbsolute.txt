@@ -1,0 +1,14 @@
+C:\Users\Usuario\MonitoramentoAmbiental\Cliente\bin\Debug\net10.0\Cliente.exe
+C:\Users\Usuario\MonitoramentoAmbiental\Cliente\bin\Debug\net10.0\Cliente.deps.json
+C:\Users\Usuario\MonitoramentoAmbiental\Cliente\bin\Debug\net10.0\Cliente.runtimeconfig.json
+C:\Users\Usuario\MonitoramentoAmbiental\Cliente\bin\Debug\net10.0\Cliente.dll
+C:\Users\Usuario\MonitoramentoAmbiental\Cliente\bin\Debug\net10.0\Cliente.pdb
+C:\Users\Usuario\MonitoramentoAmbiental\Cliente\obj\Debug\net10.0\Cliente.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Usuario\MonitoramentoAmbiental\Cliente\obj\Debug\net10.0\Cliente.AssemblyInfoInputs.cache
+C:\Users\Usuario\MonitoramentoAmbiental\Cliente\obj\Debug\net10.0\Cliente.AssemblyInfo.cs
+C:\Users\Usuario\MonitoramentoAmbiental\Cliente\obj\Debug\net10.0\Cliente.csproj.CoreCompileInputs.cache
+C:\Users\Usuario\MonitoramentoAmbiental\Cliente\obj\Debug\net10.0\Cliente.dll
+C:\Users\Usuario\MonitoramentoAmbiental\Cliente\obj\Debug\net10.0\refint\Cliente.dll
+C:\Users\Usuario\MonitoramentoAmbiental\Cliente\obj\Debug\net10.0\Cliente.pdb
+C:\Users\Usuario\MonitoramentoAmbiental\Cliente\obj\Debug\net10.0\Cliente.genruntimeconfig.cache
+C:\Users\Usuario\MonitoramentoAmbiental\Cliente\obj\Debug\net10.0\ref\Cliente.dll
