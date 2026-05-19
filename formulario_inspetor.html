@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Monitoramento Ambiental — Rio Tietê</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --azul: #2563eb;
+      --azul-escuro: #1d4ed8;
+      --azul-claro: #eff6ff;
+      --azul-medio: #dbeafe;
+      --bg: #f8fafc;
+      --branco: #ffffff;
+      --borda: #e2e8f0;
+      --texto: #0f172a;
+      --texto-suave: #64748b;
+      --verde: #16a34a;
+      --verde-bg: #f0fdf4;
+      --vermelho: #dc2626;
+      --vermelho-bg: #fef2f2;
+      --amarelo: #d97706;
+      --amarelo-bg: #fffbeb;
+      --sombra: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
+      --sombra-md: 0 4px 6px rgba(0,0,0,0.07), 0 2px 4px rgba(0,0,0,0.04);
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--texto);
+      min-height: 100vh;
+    }
+
+    header {
+      background: var(--branco);
+      border-bottom: 1px solid var(--borda);
+      padding: 0 48px;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      box-shadow: var(--sombra);
+    }
+
+    .logo { display: flex; align-items: center; gap: 14px; }
+    .logo-icon {
+      width: 38px; height: 38px;
+      background: var(--azul);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .logo-icon-inner {
+      width: 16px; height: 16px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.3);
+      position: relative;
+    }
+    .logo-icon-inner::after {
+      content: '';
+      position: absolute;
+      bottom: -4px; left: -4px;
+      width: 22px; height: 8px;
+      border-radius: 0 0 11px 11px;
+      border: 2px solid rgba(255,255,255,0.6);
+      border-top: none;
+    }
+    .logo-nome { font-size: 15px; font-weight: 600; color: var(--texto); line-height: 1.2; }
+    .logo-sub { font-size: 12px; color: var(--texto-suave); font-weight: 400; }
+
+    .btn-nav {
+      display: flex; align-items: center; gap: 6px;
+      padding: 8px 18px; border-radius: 8px;
+      font-size: 13px; font-weight: 500;
+      cursor: pointer; text-decoration: none;
+      transition: all 0.15s;
+      border: 1px solid var(--azul);
+      background: var(--azul); color: white;
+    }
+    .btn-nav:hover { background: var(--azul-escuro); border-color: var(--azul-escuro); }
+
+    .status-bar {
+      background: var(--azul-claro);
+      border-bottom: 1px solid var(--azul-medio);
+      padding: 10px 48px;
+      display: flex; align-items: center; gap: 24px;
+    }
+    .status-item {
+      display: flex; align-items: center; gap: 7px;
+      font-size: 12px; color: var(--azul-escuro); font-weight: 500;
+    }
+    .status-dot {
+      width: 7px; height: 7px;
+      border-radius: 50%; background: var(--verde);
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
+
+    main {
+      max-width: 680px;
+      margin: 48px auto;
+      padding: 0 24px 80px;
+    }
+
+    .page-title { font-size: 24px; font-weight: 700; color: var(--texto); margin-bottom: 6px; }
+    .page-sub { font-size: 14px; color: var(--texto-suave); margin-bottom: 36px; }
+
+    .card {
+      background: var(--branco);
+      border: 1px solid var(--borda);
+      border-radius: 16px;
+      box-shadow: var(--sombra-md);
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+
+    .card-section {
+      padding: 28px 32px;
+      border-bottom: 1px solid var(--borda);
+    }
+    .card-section:last-child { border-bottom: none; }
+
+    .section-label {
+      font-size: 11px; font-weight: 600;
+      color: var(--azul); text-transform: uppercase;
+      letter-spacing: 0.08em; margin-bottom: 20px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .section-label::after { content: ''; flex: 1; height: 1px; background: var(--azul-medio); }
+
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .row.full { grid-template-columns: 1fr; }
+    .field { display: flex; flex-direction: column; gap: 7px; }
+
+    label { font-size: 13px; font-weight: 500; color: var(--texto); }
+
+    select, input {
+      font-family: 'Inter', sans-serif; font-size: 14px;
+      padding: 11px 14px;
+      background: var(--bg);
+      border: 1.5px solid var(--borda);
+      border-radius: 10px; color: var(--texto);
+      outline: none; transition: all 0.15s; appearance: none; width: 100%;
+    }
+    select:hover, input:hover { border-color: #94a3b8; }
+    select:focus, input:focus {
+      background: var(--branco);
+      border-color: var(--azul);
+      box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+    }
+    select {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: right 12px center;
+      padding-right: 36px; cursor: pointer;
+    }
+
+    /* RISCO */
+    .risco-grupo { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    .risco-op { display: none; }
+    .risco-label {
+      display: flex; align-items: center; justify-content: center;
+      padding: 14px 10px;
+      border: 1.5px solid var(--borda);
+      border-radius: 12px; font-size: 13px; font-weight: 600;
+      cursor: pointer; transition: all 0.15s;
+      background: var(--bg); color: var(--texto-suave);
+    }
+    #n1:checked + .risco-label { background: var(--verde-bg); border-color: var(--verde); color: var(--verde); }
+    #n2:checked + .risco-label { background: var(--amarelo-bg); border-color: var(--amarelo); color: var(--amarelo); }
+    #n3:checked + .risco-label { background: var(--vermelho-bg); border-color: var(--vermelho); color: var(--vermelho); }
+
+    .card-footer {
+      padding: 20px 32px;
+      display: flex; justify-content: space-between; align-items: center;
+      background: var(--bg); border-top: 1px solid var(--borda);
+    }
+
+    .btn-limpar {
+      font-size: 13px; color: var(--texto-suave);
+      background: none; border: none; cursor: pointer;
+      font-family: 'Inter', sans-serif; font-weight: 500;
+      padding: 8px 12px; border-radius: 8px; transition: all 0.15s;
+    }
+    .btn-limpar:hover { background: var(--borda); color: var(--texto); }
+
+    .btn-enviar {
+      display: flex; align-items: center; gap: 8px;
+      padding: 11px 28px; border-radius: 10px; border: none;
+      background: var(--azul); color: white;
+      font-size: 14px; font-weight: 600;
+      font-family: 'Inter', sans-serif; cursor: pointer;
+      transition: all 0.15s;
+      box-shadow: 0 1px 3px rgba(37,99,235,0.3);
+    }
+    .btn-enviar:hover { background: var(--azul-escuro); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(37,99,235,0.35); }
+    .btn-enviar:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+    .alerta {
+      padding: 14px 18px; border-radius: 12px;
+      font-size: 13px; font-weight: 500;
+      display: none; margin-bottom: 16px; border: 1px solid;
+    }
+    .alerta.ok { background: var(--verde-bg); border-color: #86efac; color: var(--verde); }
+    .alerta.erro { background: var(--vermelho-bg); border-color: #fca5a5; color: var(--vermelho); }
+
+    /* LOG */
+    .log-header {
+      padding: 16px 24px; border-bottom: 1px solid var(--borda);
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .log-titulo { font-size: 13px; font-weight: 600; color: var(--texto); }
+    .log-badge {
+      font-size: 11px; font-weight: 600;
+      background: var(--verde-bg); color: var(--verde);
+      padding: 3px 10px; border-radius: 20px; border: 1px solid #86efac;
+    }
+    .log-body {
+      padding: 16px 24px; min-height: 110px; max-height: 180px;
+      overflow-y: auto; font-family: 'SF Mono', 'Fira Code', monospace;
+      font-size: 12px; line-height: 2;
+      background: #0f172a; border-radius: 0 0 16px 16px;
+    }
+    .log-linha { display: flex; gap: 12px; }
+    .log-time { color: #475569; flex-shrink: 0; }
+    .log-ok { color: #4ade80; } .log-erro { color: #f87171; }
+    .log-info { color: #60a5fa; } .log-vazio { color: #334155; font-style: italic; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-icon"><div class="logo-icon-inner"></div></div>
+    <div>
+      <div class="logo-nome">Monitoramento Ambiental</div>
+      <div class="logo-sub">Rio Tietê · Secretaria do Meio Ambiente</div>
+    </div>
+  </div>
+  <a href="dashboard.html" class="btn-nav">Dashboard</a>
+</header>
+
+<div class="status-bar">
+  <div class="status-item"><span class="status-dot"></span> Servidor TCP · localhost:5000</div>
+  <div class="status-item"><span class="status-dot"></span> HTTP API · localhost:5001</div>
+  <div class="status-item"><span class="status-dot"></span> Oracle XE · localhost:1521</div>
+</div>
+
+<main>
+  <div class="page-title">Envio de Medição Ambiental</div>
+  <div class="page-sub">Preencha os dados coletados em campo. Os dados serão transmitidos via TCP/IP para o servidor central e persistidos no Oracle Database.</div>
+
+  <div id="alerta" class="alerta"></div>
+
+  <div class="card">
+    <div class="card-section">
+      <div class="section-label">Identificação do Inspetor</div>
+      <div class="row">
+        <div class="field">
+          <label>Inspetor responsável</label>
+          <select id="inspetor">
+            <option value="">Selecione o inspetor...</option>
+            <option value="Carlos Mendes">Carlos Mendes — INS-001</option>
+            <option value="Ana Paula Rocha">Ana Paula Rocha — INS-002</option>
+            <option value="Roberto Silva">Roberto Silva — INS-003</option>
+            <option value="Henry dos Santos Carrijo">Henry dos Santos Carrijo — INS-004</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Município / Ponto de coleta</label>
+          <select id="municipio">
+            <option value="">Selecione o município...</option>
+            <option value="Salesopolis">Salesópolis — Nascente do Rio</option>
+            <option value="Mogi das Cruzes">Mogi das Cruzes — Trecho Médio</option>
+            <option value="Santo Andre">Santo André — Região Metropolitana</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="card-section">
+      <div class="section-label">Dados da Medição</div>
+      <div class="row" style="margin-bottom:16px">
+        <div class="field">
+          <label>Parâmetro ambiental</label>
+          <select id="parametro">
+            <option value="">Selecione o parâmetro...</option>
+            <option value="pH">pH — Potencial Hidrogeniônico</option>
+            <option value="DBO">DBO — Demanda Bioquímica de Oxigênio</option>
+            <option value="Metais Pesados">Metais Pesados</option>
+            <option value="Turbidez">Turbidez</option>
+            <option value="Temperatura">Temperatura</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Tipo de relatório</label>
+          <select id="tipo">
+            <option value="ROTINA">Rotina</option>
+            <option value="EMERGENCIA">Emergência</option>
+            <option value="TRANSFERENCIA">Transferência</option>
+          </select>
+        </div>
+      </div>
+      <div class="row">
+        <div class="field">
+          <label>Valor medido</label>
+          <input type="number" id="valor" placeholder="Ex: 6.5" step="0.01" min="0">
+        </div>
+        <div class="field">
+          <label>Unidade de medida</label>
+          <select id="unidade">
+            <option value="pH">pH</option>
+            <option value="mg/L">mg/L</option>
+            <option value="NTU">NTU</option>
+            <option value="°C">°C</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="card-section">
+      <div class="section-label">Nível de Risco</div>
+      <div class="risco-grupo">
+        <div>
+          <input class="risco-op" type="radio" name="risco" id="n1" value="NORMAL" checked>
+          <label class="risco-label" for="n1">Normal</label>
+        </div>
+        <div>
+          <input class="risco-op" type="radio" name="risco" id="n2" value="ATENCAO">
+          <label class="risco-label" for="n2">Atenção</label>
+        </div>
+        <div>
+          <input class="risco-op" type="radio" name="risco" id="n3" value="CRITICO">
+          <label class="risco-label" for="n3">Crítico</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="card-footer">
+      <button class="btn-limpar" onclick="limpar()">Limpar formulário</button>
+      <button class="btn-enviar" id="btn-enviar" onclick="enviar()">Enviar Medição</button>
+    </div>
+  </div>
+
+  <div class="card" style="overflow:hidden">
+    <div class="log-header">
+      <div class="log-titulo">Log de Transmissão TCP</div>
+      <div class="log-badge">Tempo real</div>
+    </div>
+    <div class="log-body" id="log">
+      <div class="log-linha"><span class="log-vazio">Aguardando envio de dados...</span></div>
+    </div>
+  </div>
+</main>
+
+<script>
+  function agora() { return new Date().toLocaleTimeString('pt-BR', { hour12: false }); }
+
+  function log(msg, tipo = 'info') {
+    const el = document.getElementById('log');
+    if (el.querySelector('.log-vazio')) el.innerHTML = '';
+    const l = document.createElement('div');
+    l.className = 'log-linha';
+    l.innerHTML = `<span class="log-time">[${agora()}]</span><span class="log-${tipo}">${msg}</span>`;
+    el.appendChild(l);
+    el.scrollTop = el.scrollHeight;
+  }
+
+  function mostrarAlerta(msg, tipo) {
+    const el = document.getElementById('alerta');
+    el.textContent = msg;
+    el.className = `alerta ${tipo}`;
+    el.style.display = 'block';
+    setTimeout(() => el.style.display = 'none', 5000);
+  }
+
+  async function enviar() {
+    const inspetor  = document.getElementById('inspetor').value;
+    const municipio = document.getElementById('municipio').value;
+    const parametro = document.getElementById('parametro').value;
+    const valor     = document.getElementById('valor').value;
+    const unidade   = document.getElementById('unidade').value;
+    const tipo      = document.getElementById('tipo').value;
+    const risco     = document.querySelector('input[name="risco"]:checked').value;
+
+    if (!inspetor || !municipio || !parametro || !valor) {
+      mostrarAlerta('Preencha todos os campos obrigatórios antes de enviar.', 'erro');
+      return;
+    }
+
+    const dados = {
+      nome_inspetor: inspetor, municipio, tipo,
+      descricao: `Medição de ${parametro} em ${municipio}`,
+      parametro, valor: parseFloat(valor), unidade, nivel_risco: risco
+    };
+
+    const btn = document.getElementById('btn-enviar');
+    btn.disabled = true; btn.textContent = 'Enviando...';
+    log(`Iniciando transmissão para localhost:5001...`, 'info');
+
+    try {
+      const resp = await fetch('http://localhost:5001/medicao', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(dados)
+      });
+      const texto = await resp.text();
+      if (resp.ok) {
+        log(`Conexão TCP estabelecida com sucesso`, 'ok');
+        log(`Pacote transmitido: ${parametro} = ${valor} ${unidade} [${risco}]`, 'ok');
+        log(`Resposta do servidor: ${texto}`, 'ok');
+        log(`Registro persistido no Oracle XE`, 'ok');
+        mostrarAlerta('Medição transmitida e salva no banco com sucesso!', 'ok');
+      } else {
+        log(`Erro HTTP ${resp.status}: ${texto}`, 'erro');
+        mostrarAlerta('Erro ao enviar. Verifique se o servidor está rodando.', 'erro');
+      }
+    } catch(e) {
+      log(`Falha na conexão: ${e.message}`, 'erro');
+      log(`Verifique se o servidor C# está rodando na porta 5001`, 'erro');
+      mostrarAlerta('Servidor não encontrado. Inicie o servidor C# primeiro.', 'erro');
+    }
+
+    btn.disabled = false; btn.textContent = 'Enviar Medição';
+  }
+
+  function limpar() {
+    ['inspetor','municipio','parametro','valor'].forEach(id => {
+      document.getElementById(id).value = '';
+    });
+    document.getElementById('n1').checked = true;
+    document.getElementById('alerta').style.display = 'none';
+  }
+</script>
+</body>
+</html>

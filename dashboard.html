@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard — Monitoramento Rio Tietê</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --azul: #2563eb;
+      --azul-escuro: #1d4ed8;
+      --azul-claro: #eff6ff;
+      --azul-medio: #dbeafe;
+      --bg: #f8fafc;
+      --branco: #ffffff;
+      --borda: #e2e8f0;
+      --texto: #0f172a;
+      --texto-suave: #64748b;
+      --verde: #16a34a;
+      --verde-bg: #f0fdf4;
+      --vermelho: #dc2626;
+      --vermelho-bg: #fef2f2;
+      --amarelo: #d97706;
+      --amarelo-bg: #fffbeb;
+      --sombra: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
+      --sombra-md: 0 4px 6px rgba(0,0,0,0.07), 0 2px 4px rgba(0,0,0,0.04);
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--texto);
+      min-height: 100vh;
+    }
+
+    header {
+      background: var(--branco);
+      border-bottom: 1px solid var(--borda);
+      padding: 0 48px;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      box-shadow: var(--sombra);
+    }
+
+    .logo { display: flex; align-items: center; gap: 14px; }
+    .logo-icon { width: 38px; height: 38px; background: var(--azul); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+    .logo-nome { font-size: 15px; font-weight: 600; color: var(--texto); line-height: 1.2; }
+    .logo-sub { font-size: 12px; color: var(--texto-suave); font-weight: 400; }
+
+    .header-right { display: flex; align-items: center; gap: 12px; }
+    .ultima-atualizacao { font-size: 12px; color: var(--texto-suave); }
+
+    .btn-nav {
+      display: flex; align-items: center; gap: 6px;
+      padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 500;
+      cursor: pointer; text-decoration: none; transition: all 0.15s;
+      border: 1px solid var(--borda); background: var(--branco); color: var(--texto-suave);
+    }
+    .btn-nav:hover { background: var(--bg); color: var(--texto); border-color: #cbd5e1; }
+    .btn-nav.primario { background: var(--azul); color: white; border-color: var(--azul); }
+    .btn-nav.primario:hover { background: var(--azul-escuro); border-color: var(--azul-escuro); }
+
+    .status-bar {
+      background: var(--azul-claro); border-bottom: 1px solid var(--azul-medio);
+      padding: 10px 48px; display: flex; align-items: center; gap: 24px;
+    }
+    .status-item { display: flex; align-items: center; gap: 7px; font-size: 12px; color: var(--azul-escuro); font-weight: 500; }
+    .status-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--verde); animation: pulse 2s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.6;transform:scale(0.9)} }
+
+    main { max-width: 1100px; margin: 48px auto; padding: 0 24px 80px; }
+
+    .page-title { font-size: 24px; font-weight: 700; color: var(--texto); margin-bottom: 6px; }
+    .page-sub { font-size: 14px; color: var(--texto-suave); margin-bottom: 36px; }
+
+    /* CARDS */
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+
+    .card-num {
+      background: var(--branco);
+      border: 1px solid var(--borda);
+      border-radius: 14px;
+      padding: 24px;
+      box-shadow: var(--sombra);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card-num::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: var(--azul);
+      border-radius: 14px 14px 0 0;
+    }
+
+    .card-num.verde::before { background: var(--verde); }
+    .card-num.vermelho::before { background: var(--vermelho); }
+    .card-num.amarelo::before { background: var(--amarelo); }
+
+    .card-num .icone { font-size: 24px; margin-bottom: 12px; }
+    .card-num .label { font-size: 12px; font-weight: 500; color: var(--texto-suave); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.04em; }
+    .card-num .numero { font-size: 36px; font-weight: 700; color: var(--texto); line-height: 1; }
+
+    /* PAINÉIS */
+    .painel-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+
+    .painel {
+      background: var(--branco);
+      border: 1px solid var(--borda);
+      border-radius: 14px;
+      box-shadow: var(--sombra);
+      overflow: hidden;
+    }
+
+    .painel-header {
+      padding: 18px 24px;
+      border-bottom: 1px solid var(--borda);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .painel-titulo { font-size: 14px; font-weight: 600; color: var(--texto); }
+    .painel-sub { font-size: 12px; color: var(--texto-suave); }
+
+    .painel-body { padding: 24px; }
+
+    /* GRÁFICO */
+    .grafico { display: flex; flex-direction: column; gap: 18px; }
+
+    .barra-item { display: flex; flex-direction: column; gap: 7px; }
+
+    .barra-info {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .barra-nome { font-size: 13px; font-weight: 500; color: var(--texto); }
+    .barra-valor { font-size: 13px; font-weight: 600; color: var(--azul); }
+
+    .barra-track {
+      height: 10px;
+      background: var(--azul-medio);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+
+    .barra-fill {
+      height: 100%;
+      background: var(--azul);
+      border-radius: 99px;
+      transition: width 0.8s cubic-bezier(0.4,0,0.2,1);
+      min-width: 4px;
+    }
+
+    .barra-fill.verde { background: var(--verde); }
+    .barra-fill.amarelo { background: var(--amarelo); }
+    .barra-fill.vermelho { background: var(--vermelho); }
+
+    /* TABELA */
+    .tabela-painel { margin-bottom: 20px; }
+
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+
+    thead tr {
+      background: var(--bg);
+      border-bottom: 1px solid var(--borda);
+    }
+
+    th {
+      text-align: left;
+      padding: 12px 20px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--texto-suave);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    td {
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--bg);
+      color: var(--texto);
+    }
+
+    tbody tr:hover { background: var(--bg); }
+    tbody tr:last-child td { border-bottom: none; }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: 20px;
+    }
+
+    .badge.normal { background: var(--verde-bg); color: var(--verde); border: 1px solid #86efac; }
+    .badge.atencao { background: var(--amarelo-bg); color: var(--amarelo); border: 1px solid #fcd34d; }
+    .badge.critico { background: var(--vermelho-bg); color: var(--vermelho); border: 1px solid #fca5a5; }
+
+    .vazio { text-align: center; padding: 40px; color: var(--texto-suave); font-size: 13px; }
+
+    .carregando {
+      text-align: center;
+      padding: 40px;
+      color: var(--texto-suave);
+      font-size: 13px;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-icon">🌊</div>
+    <div>
+      <div class="logo-nome">Monitoramento Ambiental</div>
+      <div class="logo-sub">Rio Tietê · Secretaria do Meio Ambiente</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <span class="ultima-atualizacao" id="ultima">Carregando...</span>
+    <a href="formulario_inspetor.html" class="btn-nav primario">+ Nova Medição</a>
+  </div>
+</header>
+
+<div class="status-bar">
+  <div class="status-item"><span class="status-dot"></span> Servidor TCP · localhost:5000</div>
+  <div class="status-item"><span class="status-dot"></span> API REST · localhost:5001</div>
+  <div class="status-item"><span class="status-dot"></span> Oracle XE · localhost:1521</div>
+  <div class="status-item">↻ Atualização automática a cada 10s</div>
+</div>
+
+<main>
+  <div class="page-title">Dashboard de Monitoramento</div>
+  <div class="page-sub">Visão geral das medições ambientais coletadas ao longo do Rio Tietê em tempo real.</div>
+
+  <!-- CARDS -->
+  <div class="cards-grid">
+    <div class="card-num azul">
+      <div class="icone">📊</div>
+      <div class="label">Total de Medições</div>
+      <div class="numero" id="card-medicoes">—</div>
+    </div>
+    <div class="card-num verde">
+      <div class="icone">👤</div>
+      <div class="label">Inspetores Online</div>
+      <div class="numero" id="card-inspetores">—</div>
+    </div>
+    <div class="card-num">
+      <div class="icone">📋</div>
+      <div class="label">Relatórios</div>
+      <div class="numero" id="card-relatorios">—</div>
+    </div>
+    <div class="card-num vermelho">
+      <div class="icone">🚨</div>
+      <div class="label">Alertas Críticos</div>
+      <div class="numero" id="card-criticos">—</div>
+    </div>
+  </div>
+
+  <!-- GRÁFICOS -->
+  <div class="painel-grid">
+    <div class="painel">
+      <div class="painel-header">
+        <div>
+          <div class="painel-titulo">Medições por Município</div>
+          <div class="painel-sub">Quantidade de registros por região</div>
+        </div>
+      </div>
+      <div class="painel-body">
+        <div class="grafico" id="grafico-municipio">
+          <div class="carregando">Carregando dados...</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="painel">
+      <div class="painel-header">
+        <div>
+          <div class="painel-titulo">Distribuição de Risco</div>
+          <div class="painel-sub">Nível de risco das medições registradas</div>
+        </div>
+      </div>
+      <div class="painel-body">
+        <div class="grafico" id="grafico-risco">
+          <div class="carregando">Carregando dados...</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TABELA -->
+  <div class="painel tabela-painel">
+    <div class="painel-header">
+      <div>
+        <div class="painel-titulo">Medições Recentes</div>
+        <div class="painel-sub">Últimas medições registradas no sistema</div>
+      </div>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>Inspetor</th>
+          <th>Município</th>
+          <th>Parâmetro</th>
+          <th>Valor</th>
+          <th>Nível de Risco</th>
+          <th>Data / Hora</th>
+        </tr>
+      </thead>
+      <tbody id="tabela-body">
+        <tr><td colspan="6" class="carregando">Carregando dados...</td></tr>
+      </tbody>
+    </table>
+  </div>
+</main>
+
+<script>
+  const RISCOS = { NORMAL: 'normal', ATENCAO: 'atencao', CRITICO: 'critico' };
+  const RISCO_LABELS = { NORMAL: '✅ Normal', ATENCAO: '⚠️ Atenção', CRITICO: '🚨 Crítico' };
+  const RISCO_CORES = { NORMAL: 'verde', ATENCAO: 'amarelo', CRITICO: 'vermelho' };
+
+  async function carregar() {
+    try {
+      const [resumo, dados] = await Promise.all([
+        fetch('http://localhost:5001/resumo').then(r => r.json()),
+        fetch('http://localhost:5001/dados').then(r => r.json())
+      ]);
+
+      // Cards
+      document.getElementById('card-medicoes').textContent = resumo.medicoes;
+      document.getElementById('card-inspetores').textContent = resumo.inspetores;
+      document.getElementById('card-relatorios').textContent = resumo.relatorios;
+      document.getElementById('card-criticos').textContent = resumo.criticos;
+
+      // Gráfico por município
+      const porMun = {};
+      dados.forEach(d => { porMun[d.municipio] = (porMun[d.municipio] || 0) + 1; });
+      const maxMun = Math.max(...Object.values(porMun), 1);
+      const grafMun = document.getElementById('grafico-municipio');
+      grafMun.innerHTML = Object.keys(porMun).length === 0
+        ? '<div class="vazio">Nenhuma medição registrada ainda</div>'
+        : Object.entries(porMun).map(([mun, qtd]) => `
+          <div class="barra-item">
+            <div class="barra-info">
+              <span class="barra-nome">${mun}</span>
+              <span class="barra-valor">${qtd} medição${qtd > 1 ? 'ões' : ''}</span>
+            </div>
+            <div class="barra-track">
+              <div class="barra-fill" style="width:${Math.round(qtd/maxMun*100)}%"></div>
+            </div>
+          </div>`).join('');
+
+      // Gráfico por risco
+      const porRisco = { NORMAL: 0, ATENCAO: 0, CRITICO: 0 };
+      dados.forEach(d => { if (porRisco[d.risco] !== undefined) porRisco[d.risco]++; });
+      const maxRisco = Math.max(...Object.values(porRisco), 1);
+      const grafRisco = document.getElementById('grafico-risco');
+      grafRisco.innerHTML = Object.entries(porRisco).map(([r, qtd]) => `
+        <div class="barra-item">
+          <div class="barra-info">
+            <span class="barra-nome">${RISCO_LABELS[r]}</span>
+            <span class="barra-valor">${qtd}</span>
+          </div>
+          <div class="barra-track">
+            <div class="barra-fill ${RISCO_CORES[r]}" style="width:${Math.round(qtd/maxRisco*100)}%"></div>
+          </div>
+        </div>`).join('');
+
+      // Tabela
+      const tbody = document.getElementById('tabela-body');
+      tbody.innerHTML = dados.length === 0
+        ? '<tr><td colspan="6" class="vazio">Nenhuma medição registrada ainda</td></tr>'
+        : dados.map(d => `
+          <tr>
+            <td><strong>${d.inspetor}</strong></td>
+            <td>${d.municipio}</td>
+            <td>${d.parametro}</td>
+            <td><strong>${d.valor}</strong> ${d.unidade}</td>
+            <td><span class="badge ${RISCOS[d.risco] || 'normal'}">${RISCO_LABELS[d.risco] || d.risco}</span></td>
+            <td>${d.data}</td>
+          </tr>`).join('');
+
+      document.getElementById('ultima').textContent =
+        'Atualizado às ' + new Date().toLocaleTimeString('pt-BR');
+
+    } catch(e) {
+      document.getElementById('ultima').textContent = '⚠️ Servidor offline';
+    }
+  }
+
+  carregar();
+  setInterval(carregar, 10000);
+</script>
+</body>
+</html>
